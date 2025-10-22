@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Música ao Vivo - Washington Soul</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #5b247a 0%, #1bcedf 100%);
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+        }
+        
+        .header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        h1 {
+            color: white;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #e9d5ff;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .admin-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .admin-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .admin-panel {
+            background: #fbbf24;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .admin-panel.active {
+            display: block;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-add {
+            background: #5b247a;
+            color: white;
+        }
+        
+        .btn-add:hover {
+            background: #4c1d64;
+        }
+        
+        .btn-logout {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #c084fc;
+            border-radius: 10px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #fbbf24;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+        
+        .music-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .music-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .music-card:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .music-info h3 {
+            font-size: 18px;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+        
+        .music-info p {
+            color: #6b7280;
+        }
+        
+        .music-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-heart {
+            background: #e5e7eb;
+            color: #6b7280;
+            padding: 10px;
+            border-radius: 50%;
+        }
+        
+        .btn-heart.active {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-request {
+            background: #22c55e;
+            color: white;
+        }
+        
+        .btn-request:hover {
+            background: #16a34a;
+        }
+        
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.75;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #5b247a;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            background: #22c55e;
+            color: white;
+            padding: 15px;
+        }
+        
+        .btn-submit:hover {
+            background: #16a34a;
+        }
+        
+        .btn-login {
+            width: 100%;
+            background: #5b247a;
+            color: white;
+            padding: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 20px;
+            }
+            
+            .music-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .music-actions {
+                width: 100%;
+                margin-top: 15px;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="header-title">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2">
+                    <path d="M9 18V5l12-2v13"></path>
+                    <circle cx="6" cy="18" r="3"></circle>
+                    <circle cx="18" cy="16" r="3"></circle>
+                </svg>
+                <div>
+                    <h1>Música ao Vivo - Washington Soul</h1>
+                    <div class="subtitle">Escolha sua música favorita e envie o pedido</div>
+                </div>
+            </div>
+            <button class="admin-btn" id="adminBtn" title="Área Administrativa">⚙️</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="admin-panel" id="adminPanel">
+            <div class="admin-header">
+                <h2>🎵 Modo Administrador</h2>
+                <button class="btn btn-add" id="addMusicBtn">➕ Adicionar Música</button>
+            </div>
+            <p>Total de músicas no repertório: <strong id="totalSongs">0</strong></p>
+        </div>
+
+        <div class="search-box">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" class="search-input" id="searchInput" placeholder="Buscar música ou artista...">
+        </div>
+
+        <div class="music-list" id="musicList"></div>
+
+        <div class="footer">
+            <p>💫 Aproveite sua estadia com boa música!</p>
+        </div>
+    </div>
+
+    <!-- Modal Login -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔒 Acesso Administrativo</h2>
+                <button class="close-btn" id="closeLogin">×</button>
+            </div>
+            <div class="form-group">
+                <input type="password" id="passwordInput" placeholder="Digite a senha">
+            </div>
+            <button class="btn btn-login" id="loginBtn">Entrar</button>
+        </div>
+    </div>
+
+    <!-- Modal Add Music -->
+    <div class="modal" id="addMusicModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Adicionar Nova Música</h2>
+                <button class="close-btn" id="closeAddMusic">×</button>
+            </div>
+            <div class="form-group">
+                <label>Nome da Música</label>
+                <input type="text" id="musicName" placeholder="Ex: Garota de Ipanema">
+            </div>
+            <div class="form-group">
+                <label>Artista</label>
+                <input type="text" id="artistName" placeholder="Ex: Tom Jobim">
+            </div>
+            <button class="btn btn-submit" id="submitMusic">➕ Adicionar ao Repertório</button>
+        </div>
+    </div>
+
+    <script>
+        const WHATSAPP = '5511912785550';
+        const PASSWORD = 'hotel2024';
+        
+        let repertorio = [
+            { id: 1, musica: 'Garota de Ipanema', artista: 'Tom Jobim' },
+            { id: 2, musica: 'Eu Sei Que Vou Te Amar', artista: 'Tom Jobim' },
+            { id: 3, musica: 'Mas Que Nada', artista: 'Jorge Ben Jor' },
+            { id: 4, musica: 'Águas de Março', artista: 'Tom Jobim' },
+            { id: 5, musica: 'Chega de Saudade', artista: 'João Gilberto' },
+            { id: 6, musica: 'Corcovado', artista: 'Tom Jobim' },
+            { id: 7, musica: 'Wave', artista: 'Tom Jobim' },
+            { id: 8, musica: 'Só Danço Samba', artista: 'Tom Jobim' },
+            { id: 9, musica: 'Desafinado', artista: 'Tom Jobim' },
+            { id: 10, musica: 'Samba de Uma Nota Só', artista: 'Tom Jobim' },
+        ];
+        
+        let isAdmin = false;
+        let favorites = [];
+        
+        // Carregar dados salvos
+        const saved = localStorage.getItem('repertorio-washington');
+        if (saved) {
+            try {
+                repertorio = JSON.parse(saved);
+            } catch (e) {}
+        }
+        
+        function saveRepertorio() {
+            localStorage.setItem('repertorio-washington', JSON.stringify(repertorio));
+        }
+        
+        function renderMusic(search = '') {
+            const list = document.getElementById('musicList');
+            const filtered = repertorio.filter(m => 
+                m.musica.toLowerCase().includes(search.toLowerCase()) ||
+                m.artista.toLowerCase().includes(search.toLowerCase())
+            );
+            
+            if (filtered.length === 0) {
+                list.innerHTML = '<div style="text-align:center;color:white;padding:50px;">Nenhuma música encontrada</div>';
+                return;
+            }
+            
+            list.innerHTML = filtered.map(m => `
+                <div class="music-card">
+                    <div class="music-info">
+                        <h3>${m.musica}</h3>
+                        <p>${m.artista}</p>
+                    </div>
+                    <div class="music-actions">
+                        ${!isAdmin ? `
+                            <button class="btn btn-heart ${favorites.includes(m.id) ? 'active' : ''}" onclick="toggleFavorite(${m.id})">
+                                ❤️
+                            </button>
+                            <button class="btn btn-request" onclick="sendWhatsApp('${m.musica}', '${m.artista}')">
+                                📤 Pedir
+                            </button>
+                        ` : `
+                            <button class="btn btn-delete" onclick="deleteMusic(${m.id})">
+                                🗑️ Excluir
+                            </button>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('totalSongs').textContent = repertorio.length;
+        }
+        
+        function toggleFavorite(id) {
+            if (favorites.includes(id)) {
+                favorites = favorites.filter(f => f !== id);
+            } else {
+                favorites.push(id);
+            }
+            renderMusic(document.getElementById('searchInput').value);
+        }
+        
+        function sendWhatsApp(musica, artista) {
+            const msg = encodeURIComponent(`Olá! Gostaria de pedir a música:\n🎵 ${musica} - ${artista}`);
+            window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP}&text=${msg}`, '_blank');
+        }
+        
+        function deleteMusic(id) {
+            if (confirm('Tem certeza que deseja remover esta música?')) {
+                repertorio = repertorio.filter(m => m.id !== id);
+                saveRepertorio();
+                renderMusic(document.getElementById('searchInput').value);
+            }
+        }
+        
+        // Event Listeners
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            renderMusic(e.target.value);
+        });
+        
+        document.getElementById('adminBtn').addEventListener('click', () => {
+            if (isAdmin) {
+                isAdmin = false;
+                document.getElementById('adminPanel').classList.remove('active');
+                document.getElementById('adminBtn').textContent = '⚙️';
+                renderMusic();
+            } else {
+                document.getElementById('loginModal').classList.add('active');
+            }
+        });
+        
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            const pwd = document.getElementById('passwordInput').value;
+            if (pwd === PASSWORD) {
+                isAdmin = true;
+                document.getElementById('loginModal').classList.remove('active');
+                document.getElementById('adminPanel').classList.add('active');
+                document.getElementById('adminBtn').textContent = '🚪 Sair';
+                document.getElementById('passwordInput').value = '';
+                renderMusic();
+            } else {
+                alert('Senha incorreta!');
+            }
+        });
+        
+        document.getElementById('closeLogin').addEventListener('click', () => {
+            document.getElementById('loginModal').classList.remove('active');
+        });
+        
+        document.getElementById('addMusicBtn').addEventListener('click', () => {
+            document.getElementById('addMusicModal').classList.add('active');
+        });
+        
+        document.getElementById('closeAddMusic').addEventListener('click', () => {
+            document.getElementById('addMusicModal').classList.remove('active');
+        });
+        
+        document.getElementById('submitMusic').addEventListener('click', () => {
+            const musica = document.getElementById('musicName').value.trim();
+            const artista = document.getElementById('artistName').value.trim();
+            
+            if (!musica || !artista) {
+                alert('Preencha música e artista!');
+                return;
+            }
+            
+            const newId = Math.max(...repertorio.map(m => m.id), 0) + 1;
+            repertorio.push({ id: newId, musica, artista });
+            saveRepertorio();
+            
+            document.getElementById('musicName').value = '';
+            document.getElementById('artistName').value = '';
+            document.getElementById('addMusicModal').classList.remove('active');
+            renderMusic();
+        });
+        
+        // Enter key for password
+        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('loginBtn').click();
+            }
+        });
+        
+        // Initial render
+        renderMusic();
+    </script>
+</body>
+</html>
