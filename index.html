@@ -385,6 +385,31 @@
         </div>
     </div>
 
+    <!-- Modal Request Music -->
+    <div class="modal" id="requestModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🎵 Solicitar Música</h2>
+                <button class="close-btn" id="closeRequest">×</button>
+            </div>
+            <div style="background:#f3f4f6;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <p style="margin:0;color:#6b7280;font-size:14px;">Música selecionada:</p>
+                <p style="margin:5px 0 0 0;font-weight:bold;color:#1f2937;">
+                    <span id="selectedMusic"></span> - <span id="selectedArtist"></span>
+                </p>
+            </div>
+            <div class="form-group">
+                <label>Seu nome *</label>
+                <input type="text" id="requesterName" placeholder="Digite seu nome">
+            </div>
+            <div class="form-group">
+                <label>Dedicar para (opcional)</label>
+                <input type="text" id="dedicationName" placeholder="Nome de quem vai receber a dedicatória">
+            </div>
+            <button class="btn btn-submit" id="submitRequest">📤 Enviar Pedido</button>
+        </div>
+    </div>
+
     <script>
         const WHATSAPP = '5511912785550';
         const PASSWORD = 'hotel2024';
@@ -465,8 +490,32 @@
         }
         
         function sendWhatsApp(musica, artista) {
-            const msg = encodeURIComponent(`Olá! Gostaria de pedir a música:\n🎵 ${musica} - ${artista}`);
-            window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP}&text=${msg}`, '_blank');
+            document.getElementById('selectedMusic').textContent = musica;
+            document.getElementById('selectedArtist').textContent = artista;
+            document.getElementById('requestModal').classList.add('active');
+        }
+        
+        function submitRequest() {
+            const nome = document.getElementById('requesterName').value.trim();
+            const para = document.getElementById('dedicationName').value.trim();
+            const musica = document.getElementById('selectedMusic').textContent;
+            const artista = document.getElementById('selectedArtist').textContent;
+            
+            if (!nome) {
+                alert('Por favor, informe seu nome!');
+                return;
+            }
+            
+            let msg = `Olá! Gostaria de pedir a música:\n🎵 ${musica} - ${artista}\n\n👤 Solicitante: ${nome}`;
+            if (para) {
+                msg += `\n💝 Dedicado para: ${para}`;
+            }
+            
+            window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP}&text=${encodeURIComponent(msg)}`, '_blank');
+            
+            document.getElementById('requestModal').classList.remove('active');
+            document.getElementById('requesterName').value = '';
+            document.getElementById('dedicationName').value = '';
         }
         
         function deleteMusic(id) {
@@ -518,6 +567,12 @@
         document.getElementById('closeAddMusic').addEventListener('click', () => {
             document.getElementById('addMusicModal').classList.remove('active');
         });
+        
+        document.getElementById('closeRequest').addEventListener('click', () => {
+            document.getElementById('requestModal').classList.remove('active');
+        });
+        
+        document.getElementById('submitRequest').addEventListener('click', submitRequest);
         
         document.getElementById('submitMusic').addEventListener('click', () => {
             const musica = document.getElementById('musicName').value.trim();
